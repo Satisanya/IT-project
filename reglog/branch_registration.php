@@ -14,7 +14,7 @@ if (isset($_POST["submit"])) {
         $_POST["saturday-open"], $_POST["saturday-close"],
         $_POST["sunday-open"], $_POST["sunday-close"]
     ];
-    $schedule = implode(" ",$unformatted_schedule);
+    $schedule = implode(" ", $unformatted_schedule);
     $query = "INSERT INTO tb_branch (branch_id, address, schedule) VALUES('$branch_id', '$address', '$schedule')";
     $result = mysqli_query($conn, $query);
     if (false === $result) {

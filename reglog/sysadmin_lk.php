@@ -13,7 +13,7 @@ if (!($_SESSION["login"] == true)) {
 
 <head>
   <meta charset="utf-8">
-  <title>Index</title>
+  <title>Личный кабинет</title>
 </head>
 
 <body>
@@ -21,13 +21,13 @@ if (!($_SESSION["login"] == true)) {
     <?php echo $row["fullname"]; ?>
   </h1>
   <div>
-  <a href="branch_registration.php">Добавить филиал</a>
+    <a href="branch_registration.php">Добавить филиал</a>
   </div>
   <div>
-  <a href="service_registration.php">Добавить услугу</a>
+    <a href="service_registration.php">Добавить услугу</a>
   </div>
   <div>
-  <a href="admin_registration.php">Добавить админа</a>
+    <a href="admin_registration.php">Добавить админа</a>
   </div>
   <a href="logout.php">Выйти из аккаунта</a>
 </body>
