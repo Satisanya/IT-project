@@ -7,14 +7,11 @@ require './PHPMailer/src/Exception.php';
 require './PHPMailer/src/PHPMailer.php';
 require './PHPMailer/src/SMTP.php';
 
-if (!empty($_SESSION["id"])) {
-  header("Location: index.php");
-}
-
 if (isset($_POST["submit"])) {
+  $last_id = mysqli_query($conn, "SELECT count(*) FROM tb_user")->fetch_array();
+  $user_id = intval($last_id[0]) + 1;
   $fullname = $_POST["fullname"];
   $email = $_POST["email"];
-  $role = $_POST["role"];
   $password = $_POST["password"];
   $confirmpassword = $_POST["confirmpassword"];
   $duplicate = mysqli_query($conn, "SELECT * FROM tb_user WHERE email = '$email'");
@@ -27,7 +24,7 @@ if (isset($_POST["submit"])) {
 
       $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-      $query = "INSERT INTO tb_user (fullname, password, role, email) VALUES('$fullname', '$hashed_password', '$role', '$email')";
+      $query = "INSERT INTO tb_user (user_id, fullname, password, email) VALUES('$user_id', '$fullname', '$hashed_password', '$email')";
       $mail = new PHPMailer;
       $mail->CharSet = 'UTF-8';
 
@@ -59,7 +56,7 @@ if (isset($_POST["submit"])) {
       if ($mail->send()) {
         $_SESSION['query'] = $query;
         $_SESSION['sent_ver_code'] = $sent_ver_code;
-        header("Location: verification.php");
+        header("Location: user_verification.php");
       }
     } else {
       echo
@@ -84,8 +81,6 @@ if (isset($_POST["submit"])) {
     <input type="text" name="fullname" id="fullname" required value=""> <br>
     <label for="email">Электронная почта : </label>
     <input type="text" name="email" id="email" required value=""> <br>
-    <label for="role">Роль : </label>
-    <input type="role" name="role" id="role" required value=""> <br>
     <label for="password">Пароль : </label>
     <input type="password" name="password" id="password" required value=""> <br>
     <label for="confirmpassword">Подтвердите пароль : </label>
@@ -93,7 +88,7 @@ if (isset($_POST["submit"])) {
     <button type="submit" name="submit">Зарегистрироваться</button>
   </form>
   <br>
-  <a href="login.php">Перейти к логину</a>
+  <a href="user_login.php">Перейти к логину</a>
 </body>
 
 </html>

@@ -12,11 +12,11 @@ if (isset($_POST['check'])) {
             printf("error: %s\n", mysqli_error($conn));
         } else {
             echo "<script> alert('Регистрация завершена!') </script>";
-            header("Location: login.php");
+            header("Location: user_login.php");
         }
     } else {
         echo "<script> alert('Вы ввели неверный код, попробуйте пройти регистрацию заново!!') </script>";
-        header("Location: registration.php");
+        header("Location: user_registration.php");
     }
 }
 ?>

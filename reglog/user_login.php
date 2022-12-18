@@ -9,8 +9,9 @@ if (isset($_POST["submit"])) {
   if (mysqli_num_rows($result) > 0) {
     if (password_verify($password, $row['password'])) {
       $_SESSION["login"] = true;
-      $_SESSION["id"] = $row["id"];
-      header("Location: index.php");
+      $_SESSION["flag"] = "is_user";
+      $_SESSION["user_id"] = $row["user_id"];
+      header("Location: user_lk.php");
     } else {
       echo
         "<script> showWrongPassword = true </script>";
@@ -42,7 +43,8 @@ if (isset($_POST["submit"])) {
   <br>
   <div id="wrongPasswordMsg" style="display: none;">НЕВЕРНЫЙ ПАРОЛЬ!</div>
   <br>
-  <a href="registration.php">Перейти к регистрации</a>
+  <a href="user_registration.php">Перейти к регистрации</a>
+  <a href="index.php">Перейти к главной странице</a>
 </body>
 
 </html>
