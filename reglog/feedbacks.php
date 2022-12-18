@@ -13,8 +13,8 @@ if (isset($_POST["submit"])) {
   $text = $_POST["text"];
   $query = "INSERT INTO tb_feedback (feedback_id, user_id, text) VALUES('$feedback_id', '$user_id', '$text')";
   $result = mysqli_query($conn, $query);
-  sleep(3);
-  echo "<script> alert('Ваш отзыв отправлен!') </script>";
+  echo 
+  "<script> alert('Ваш отзыв отправлен!') </script>";
   header("Location: user_lk.php");
 }
 ?>
