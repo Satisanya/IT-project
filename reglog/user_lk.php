@@ -13,13 +13,16 @@ if (!($_SESSION["login"] == true)) {
 
 <head>
   <meta charset="utf-8">
-  <title>Index</title>
+  <title>Личный кабинет</title>
 </head>
 
 <body>
   <h1>Добро пожаловать,
     <?php echo $row["fullname"]; ?>
   </h1>
+  <div>
+  <a href="appointment_registration_step1.php">Записаться на прием</a>
+  </div>
   <div>
   <a href="feedbacks.php">Оставить отзыв</a>
   </div>

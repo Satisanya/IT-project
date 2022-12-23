@@ -29,6 +29,9 @@ if (!($_SESSION["login"] == true)) {
   <div>
     <a href="admin_registration.php">Добавить админа</a>
   </div>
+  <div>
+    <a href="sysadmin_registration.php">Добавить сисадмина</a>
+  </div>
   <a href="logout.php">Выйти из аккаунта</a>
 </body>
 
