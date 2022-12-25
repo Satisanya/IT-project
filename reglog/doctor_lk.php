@@ -21,7 +21,7 @@ if (!($_SESSION["login"] == true)) {
         <?php echo $row["fullname"]; ?>
     </h1>
     <div>
-        <a href="doctor_appointments.php">Посмотреть записи</a>
+        <a href="appointment_answer.php">Посмотреть записи и добавить результаты</a>
     </div>
     <a href="logout.php">Выйти из аккаунта</a>
 </body>

@@ -2,34 +2,54 @@
 require 'config.php';
 
 $this_day = getdate()['mday'];
-$this_month = getdate()['month'];
+$this_month = getdate()['mon'];
 
 $days_in_months_list = (object) [
-    'January' => 31,
-    'February' => 28,
-    'March' => 31,
-    'April' => 30,
-    'May' => 31,
-    'June' => 30,
-    'July' => 31,
-    'August' => 31,
-    'September' => 30,
-    'October' => 31,
-    'November' => 30,
-    'December' => 31,
+    1 => 31,
+    2 => 28,
+    3 => 31,
+    4 => 30,
+    5 => 31,
+    6 => 30,
+    7 => 31,
+    8 => 31,
+    9 => 30,
+    10 => 31,
+    11 => 30,
+    12 => 31,
   ];
 
-$dropdown_dates = [$this_day];
-$dropdown_months = [$this_month];
+$names_of_months_list = (object) [
+    1 => 'January',
+    2 => 'February',
+    3 => 'March',
+    4 => 'April',
+    5 => 'May',
+    6 => 'June',
+    7 => 'July',
+    8 => 'August',
+    9 => 'September',
+    10 => 'October',
+    11 => 'November',
+    12 => 'December',
+  ];
 
-for ($i = 1; $i < 7; $i++) {
+
+$dropdown_dates = [];
+$dropdown_months = [];
+
+for ($i = 1; $i <= 7; $i++) {
     $this_day += 1;
     if ($this_day > $days_in_months_list->$this_month) {
         $this_day = 1;
-        $this_month += 1;
+        if ($this_month == 12) {
+            $this_month = 1;
+        } else {
+            $this_month += 1;
+        }
     }
     array_push($dropdown_dates, $this_day);
-    array_push($dropdown_months, $this_month);
+    array_push($dropdown_months, $names_of_months_list->$this_month);
 }
 
 $appointment_branch_id = $_SESSION["appointment_branch_id"];

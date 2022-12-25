@@ -24,7 +24,10 @@ if (!($_SESSION["login"] == true)) {
   <a href="appointment_registration_step1.php">Записаться на прием</a>
   </div>
   <div>
-  <a href="feedbacks.php">Оставить отзыв</a>
+  <a href="appointments_check.php">Посмотреть ваши записи на прием</a>
+  </div>
+  <div>
+  <a href="feedbacks.php">Оставить отзыв о клинике</a>
   </div>
   <a href="logout.php">Выйти из аккаунта</a>
 </body>

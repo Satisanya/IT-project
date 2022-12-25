@@ -2,9 +2,7 @@
 require 'config.php';
 
 if (isset($_POST["submit"])) {
-    $last_id = mysqli_query($conn, "SELECT count(*) FROM tb_branch")->fetch_array();
-    $branch_id = intval($last_id[0]) + 1;
-    $address = $_POST["address"];
+
     $unformatted_schedule = [
         $_POST["monday-open"], $_POST["monday-close"],
         $_POST["tuesday-open"], $_POST["tuesday-close"],
@@ -14,14 +12,33 @@ if (isset($_POST["submit"])) {
         $_POST["saturday-open"], $_POST["saturday-close"],
         $_POST["sunday-open"], $_POST["sunday-close"]
     ];
-    $schedule = implode(" ", $unformatted_schedule);
-    $query = "INSERT INTO tb_branch (branch_id, address, schedule) VALUES('$branch_id', '$address', '$schedule')";
-    $result = mysqli_query($conn, $query);
-    if (false === $result) {
-        printf("error: %s\n", mysqli_error($conn));
+
+    $correction_check = true;
+    for ($i = 0; $i < 7; $i += 2) {
+        $opening = $unformatted_schedule[$i];
+        $closing = $unformatted_schedule[$i + 1];
+        if ((($opening == 'n') && ($closing != 'n')) || (($opening != 'n') && ($closing == 'n'))) $correction_check = false;
+
+        elseif (((is_numeric($opening) == true) && (is_numeric($closing) == true)) && ($opening >= $closing)){
+            $correction_check = false;
+        }
+    }
+
+    if ($correction_check == false) {
+        echo "Вы ввели нестыкующиеся данные - проверьте ввод и повторите снова!";
     } else {
-        echo "<script> alert('Филиал добавлен!') </script>";
-        header("Location: sysadmin_lk.php");
+        $last_id = mysqli_query($conn, "SELECT count(*) FROM tb_branch")->fetch_array();
+        $branch_id = intval($last_id[0]) + 1;
+        $address = $_POST["address"];
+        $schedule = implode(" ", $unformatted_schedule);
+        $query = "INSERT INTO tb_branch (branch_id, address, schedule) VALUES('$branch_id', '$address', '$schedule')";
+        $result = mysqli_query($conn, $query);
+        if (false === $result) {
+            printf("error: %s\n", mysqli_error($conn));
+        } else {
+            echo "<script> alert('Филиал добавлен!') </script>";
+            header("Location: sysadmin_lk.php");
+        }
     }
 }
 ?>
@@ -39,425 +56,412 @@ if (isset($_POST["submit"])) {
     <form class="" action="" method="post" autocomplete="off">
         <label for="address">Адрес : </label>
         <input type="text" name="address" id="address" required value=""> <br>
-        <div>График работы (если выходной - оставить два прочерка):</div>
+        <div>График работы (если выходной - оставить два значения "dayoff"):</div>
+        <div>График работы (если выходной - оставить два значения "n"):</div>
         <div> ПН
             <label for="monday-open">Открытие : </label>
             <select name="monday-open" id="monday-open">
-                <option>-</option>
-                <option>00-00</option>
-                <option>01-00</option>
-                <option>02-00</option>
-                <option>03-00</option>
-                <option>04-00</option>
-                <option>05-00</option>
-                <option>06-00</option>
-                <option>07-00</option>
-                <option>08-00</option>
-                <option>09-00</option>
-                <option>10-00</option>
-                <option>11-00</option>
-                <option>12-00</option>
-                <option>13-00</option>
-                <option>14-00</option>
-                <option>15-00</option>
-                <option>16-00</option>
-                <option>17-00</option>
-                <option>18-00</option>
-                <option>19-00</option>
-                <option>20-00</option>
-                <option>21-00</option>
-                <option>22-00</option>
-                <option>23-00</option>
-                <option>24-00</option>
+                <option value="n">dayoff</option>
+                <option value="0">00-00</option>
+                <option value="1">01-00</option>
+                <option value="2">02-00</option>
+                <option value="3">03-00</option>
+                <option value="4">04-00</option>
+                <option value="5">05-00</option>
+                <option value="6">06-00</option>
+                <option value="7">07-00</option>
+                <option value="8">08-00</option>
+                <option value="9">09-00</option>
+                <option value="10">10-00</option>
+                <option value="11">11-00</option>
+                <option value="12">12-00</option>
+                <option value="13">13-00</option>
+                <option value="14">14-00</option>
+                <option value="15">15-00</option>
+                <option value="16">16-00</option>
+                <option value="17">17-00</option>
+                <option value="18">18-00</option>
+                <option value="19">19-00</option>
+                <option value="20">20-00</option>
+                <option value="21">21-00</option>
+                <option value="22">22-00</option>
+                <option value="23">23-00</option>
             </select>
             <label for="monday-close">Закрытие : </label>
             <select name="monday-close" id="monday-close">
-                <option>-</option>
-                <option>00-00</option>
-                <option>01-00</option>
-                <option>02-00</option>
-                <option>03-00</option>
-                <option>04-00</option>
-                <option>05-00</option>
-                <option>06-00</option>
-                <option>07-00</option>
-                <option>08-00</option>
-                <option>09-00</option>
-                <option>10-00</option>
-                <option>11-00</option>
-                <option>12-00</option>
-                <option>13-00</option>
-                <option>14-00</option>
-                <option>15-00</option>
-                <option>16-00</option>
-                <option>17-00</option>
-                <option>18-00</option>
-                <option>19-00</option>
-                <option>20-00</option>
-                <option>21-00</option>
-                <option>22-00</option>
-                <option>23-00</option>
-                <option>24-00</option>
+                <option value="n">dayoff</option>
+                <option value="1">01-00</option>
+                <option value="2">02-00</option>
+                <option value="3">03-00</option>
+                <option value="4">04-00</option>
+                <option value="5">05-00</option>
+                <option value="6">06-00</option>
+                <option value="7">07-00</option>
+                <option value="8">08-00</option>
+                <option value="9">09-00</option>
+                <option value="10">10-00</option>
+                <option value="11">11-00</option>
+                <option value="12">12-00</option>
+                <option value="13">13-00</option>
+                <option value="14">14-00</option>
+                <option value="15">15-00</option>
+                <option value="16">16-00</option>
+                <option value="17">17-00</option>
+                <option value="18">18-00</option>
+                <option value="19">19-00</option>
+                <option value="20">20-00</option>
+                <option value="21">21-00</option>
+                <option value="22">22-00</option>
+                <option value="23">23-00</option>
+                <option value="24">24-00</option>
             </select>
         </div>
         <div> ВТ
             <label for="tuesday-open">Открытие : </label>
             <select name="tuesday-open" id="tuesday-open">
-                <option>-</option>
-                <option>00-00</option>
-                <option>01-00</option>
-                <option>02-00</option>
-                <option>03-00</option>
-                <option>04-00</option>
-                <option>05-00</option>
-                <option>06-00</option>
-                <option>07-00</option>
-                <option>08-00</option>
-                <option>09-00</option>
-                <option>10-00</option>
-                <option>11-00</option>
-                <option>12-00</option>
-                <option>13-00</option>
-                <option>14-00</option>
-                <option>15-00</option>
-                <option>16-00</option>
-                <option>17-00</option>
-                <option>18-00</option>
-                <option>19-00</option>
-                <option>20-00</option>
-                <option>21-00</option>
-                <option>22-00</option>
-                <option>23-00</option>
-                <option>24-00</option>
+                <option value="n">dayoff</option>
+                <option value="0">00-00</option>
+                <option value="1">01-00</option>
+                <option value="2">02-00</option>
+                <option value="3">03-00</option>
+                <option value="4">04-00</option>
+                <option value="5">05-00</option>
+                <option value="6">06-00</option>
+                <option value="7">07-00</option>
+                <option value="8">08-00</option>
+                <option value="9">09-00</option>
+                <option value="10">10-00</option>
+                <option value="11">11-00</option>
+                <option value="12">12-00</option>
+                <option value="13">13-00</option>
+                <option value="14">14-00</option>
+                <option value="15">15-00</option>
+                <option value="16">16-00</option>
+                <option value="17">17-00</option>
+                <option value="18">18-00</option>
+                <option value="19">19-00</option>
+                <option value="20">20-00</option>
+                <option value="21">21-00</option>
+                <option value="22">22-00</option>
+                <option value="23">23-00</option>
             </select>
             <label for="tuesday-close">Закрытие : </label>
             <select name="tuesday-close" id="tuesday-close">
-                <option>-</option>
-                <option>00-00</option>
-                <option>01-00</option>
-                <option>02-00</option>
-                <option>03-00</option>
-                <option>04-00</option>
-                <option>05-00</option>
-                <option>06-00</option>
-                <option>07-00</option>
-                <option>08-00</option>
-                <option>09-00</option>
-                <option>10-00</option>
-                <option>11-00</option>
-                <option>12-00</option>
-                <option>13-00</option>
-                <option>14-00</option>
-                <option>15-00</option>
-                <option>16-00</option>
-                <option>17-00</option>
-                <option>18-00</option>
-                <option>19-00</option>
-                <option>20-00</option>
-                <option>21-00</option>
-                <option>22-00</option>
-                <option>23-00</option>
-                <option>24-00</option>
+                <option value="n">dayoff</option>
+                <option value="1">01-00</option>
+                <option value="2">02-00</option>
+                <option value="3">03-00</option>
+                <option value="4">04-00</option>
+                <option value="5">05-00</option>
+                <option value="6">06-00</option>
+                <option value="7">07-00</option>
+                <option value="8">08-00</option>
+                <option value="9">09-00</option>
+                <option value="10">10-00</option>
+                <option value="11">11-00</option>
+                <option value="12">12-00</option>
+                <option value="13">13-00</option>
+                <option value="14">14-00</option>
+                <option value="15">15-00</option>
+                <option value="16">16-00</option>
+                <option value="17">17-00</option>
+                <option value="18">18-00</option>
+                <option value="19">19-00</option>
+                <option value="20">20-00</option>
+                <option value="21">21-00</option>
+                <option value="22">22-00</option>
+                <option value="23">23-00</option>
+                <option value="24">24-00</option>
             </select>
         </div>
         <div> СР
             <label for="wednesday-open">Открытие : </label>
             <select name="wednesday-open" id="wednesday-open">
-                <option>-</option>
-                <option>00-00</option>
-                <option>01-00</option>
-                <option>02-00</option>
-                <option>03-00</option>
-                <option>04-00</option>
-                <option>05-00</option>
-                <option>06-00</option>
-                <option>07-00</option>
-                <option>08-00</option>
-                <option>09-00</option>
-                <option>10-00</option>
-                <option>11-00</option>
-                <option>12-00</option>
-                <option>13-00</option>
-                <option>14-00</option>
-                <option>15-00</option>
-                <option>16-00</option>
-                <option>17-00</option>
-                <option>18-00</option>
-                <option>19-00</option>
-                <option>20-00</option>
-                <option>21-00</option>
-                <option>22-00</option>
-                <option>23-00</option>
-                <option>24-00</option>
+                <option value="n">dayoff</option>
+                <option value="0">00-00</option>
+                <option value="1">01-00</option>
+                <option value="2">02-00</option>
+                <option value="3">03-00</option>
+                <option value="4">04-00</option>
+                <option value="5">05-00</option>
+                <option value="6">06-00</option>
+                <option value="7">07-00</option>
+                <option value="8">08-00</option>
+                <option value="9">09-00</option>
+                <option value="10">10-00</option>
+                <option value="11">11-00</option>
+                <option value="12">12-00</option>
+                <option value="13">13-00</option>
+                <option value="14">14-00</option>
+                <option value="15">15-00</option>
+                <option value="16">16-00</option>
+                <option value="17">17-00</option>
+                <option value="18">18-00</option>
+                <option value="19">19-00</option>
+                <option value="20">20-00</option>
+                <option value="21">21-00</option>
+                <option value="22">22-00</option>
+                <option value="23">23-00</option>
             </select>
             <label for="wednesday-close">Закрытие : </label>
             <select name="wednesday-close" id="wednesday-close">
-                <option>-</option>
-                <option>00-00</option>
-                <option>01-00</option>
-                <option>02-00</option>
-                <option>03-00</option>
-                <option>04-00</option>
-                <option>05-00</option>
-                <option>06-00</option>
-                <option>07-00</option>
-                <option>08-00</option>
-                <option>09-00</option>
-                <option>10-00</option>
-                <option>11-00</option>
-                <option>12-00</option>
-                <option>13-00</option>
-                <option>14-00</option>
-                <option>15-00</option>
-                <option>16-00</option>
-                <option>17-00</option>
-                <option>18-00</option>
-                <option>19-00</option>
-                <option>20-00</option>
-                <option>21-00</option>
-                <option>22-00</option>
-                <option>23-00</option>
-                <option>24-00</option>
+                <option value="n">dayoff</option>
+                <option value="1">01-00</option>
+                <option value="2">02-00</option>
+                <option value="3">03-00</option>
+                <option value="4">04-00</option>
+                <option value="5">05-00</option>
+                <option value="6">06-00</option>
+                <option value="7">07-00</option>
+                <option value="8">08-00</option>
+                <option value="9">09-00</option>
+                <option value="10">10-00</option>
+                <option value="11">11-00</option>
+                <option value="12">12-00</option>
+                <option value="13">13-00</option>
+                <option value="14">14-00</option>
+                <option value="15">15-00</option>
+                <option value="16">16-00</option>
+                <option value="17">17-00</option>
+                <option value="18">18-00</option>
+                <option value="19">19-00</option>
+                <option value="20">20-00</option>
+                <option value="21">21-00</option>
+                <option value="22">22-00</option>
+                <option value="23">23-00</option>
+                <option value="24">24-00</option>
             </select>
         </div>
         <div> ЧТ
             <label for="thursday-open">Открытие : </label>
             <select name="thursday-open" id="thursday-open">
-                <option>-</option>
-                <option>00-00</option>
-                <option>01-00</option>
-                <option>02-00</option>
-                <option>03-00</option>
-                <option>04-00</option>
-                <option>05-00</option>
-                <option>06-00</option>
-                <option>07-00</option>
-                <option>08-00</option>
-                <option>09-00</option>
-                <option>10-00</option>
-                <option>11-00</option>
-                <option>12-00</option>
-                <option>13-00</option>
-                <option>14-00</option>
-                <option>15-00</option>
-                <option>16-00</option>
-                <option>17-00</option>
-                <option>18-00</option>
-                <option>19-00</option>
-                <option>20-00</option>
-                <option>21-00</option>
-                <option>22-00</option>
-                <option>23-00</option>
-                <option>24-00</option>
+                <option value="n">dayoff</option>
+                <option value="0">00-00</option>
+                <option value="1">01-00</option>
+                <option value="2">02-00</option>
+                <option value="3">03-00</option>
+                <option value="4">04-00</option>
+                <option value="5">05-00</option>
+                <option value="6">06-00</option>
+                <option value="7">07-00</option>
+                <option value="8">08-00</option>
+                <option value="9">09-00</option>
+                <option value="10">10-00</option>
+                <option value="11">11-00</option>
+                <option value="12">12-00</option>
+                <option value="13">13-00</option>
+                <option value="14">14-00</option>
+                <option value="15">15-00</option>
+                <option value="16">16-00</option>
+                <option value="17">17-00</option>
+                <option value="18">18-00</option>
+                <option value="19">19-00</option>
+                <option value="20">20-00</option>
+                <option value="21">21-00</option>
+                <option value="22">22-00</option>
+                <option value="23">23-00</option>
             </select>
             <label for="thursday-close">Закрытие : </label>
             <select name="thursday-close" id="thursday-close">
-                <option>-</option>
-                <option>00-00</option>
-                <option>01-00</option>
-                <option>02-00</option>
-                <option>03-00</option>
-                <option>04-00</option>
-                <option>05-00</option>
-                <option>06-00</option>
-                <option>07-00</option>
-                <option>08-00</option>
-                <option>09-00</option>
-                <option>10-00</option>
-                <option>11-00</option>
-                <option>12-00</option>
-                <option>13-00</option>
-                <option>14-00</option>
-                <option>15-00</option>
-                <option>16-00</option>
-                <option>17-00</option>
-                <option>18-00</option>
-                <option>19-00</option>
-                <option>20-00</option>
-                <option>21-00</option>
-                <option>22-00</option>
-                <option>23-00</option>
-                <option>24-00</option>
+                <option value="n">dayoff</option>
+                <option value="1">01-00</option>
+                <option value="2">02-00</option>
+                <option value="3">03-00</option>
+                <option value="4">04-00</option>
+                <option value="5">05-00</option>
+                <option value="6">06-00</option>
+                <option value="7">07-00</option>
+                <option value="8">08-00</option>
+                <option value="9">09-00</option>
+                <option value="10">10-00</option>
+                <option value="11">11-00</option>
+                <option value="12">12-00</option>
+                <option value="13">13-00</option>
+                <option value="14">14-00</option>
+                <option value="15">15-00</option>
+                <option value="16">16-00</option>
+                <option value="17">17-00</option>
+                <option value="18">18-00</option>
+                <option value="19">19-00</option>
+                <option value="20">20-00</option>
+                <option value="21">21-00</option>
+                <option value="22">22-00</option>
+                <option value="23">23-00</option>
+                <option value="24">24-00</option>
             </select>
         </div>
         <div> ПТ
             <label for="friday-open">Открытие : </label>
             <select name="friday-open" id="friday-open">
-                <option>-</option>
-                <option>00-00</option>
-                <option>01-00</option>
-                <option>02-00</option>
-                <option>03-00</option>
-                <option>04-00</option>
-                <option>05-00</option>
-                <option>06-00</option>
-                <option>07-00</option>
-                <option>08-00</option>
-                <option>09-00</option>
-                <option>10-00</option>
-                <option>11-00</option>
-                <option>12-00</option>
-                <option>13-00</option>
-                <option>14-00</option>
-                <option>15-00</option>
-                <option>16-00</option>
-                <option>17-00</option>
-                <option>18-00</option>
-                <option>19-00</option>
-                <option>20-00</option>
-                <option>21-00</option>
-                <option>22-00</option>
-                <option>23-00</option>
-                <option>24-00</option>
+                <option value="n">dayoff</option>
+                <option value="0">00-00</option>
+                <option value="1">01-00</option>
+                <option value="2">02-00</option>
+                <option value="3">03-00</option>
+                <option value="4">04-00</option>
+                <option value="5">05-00</option>
+                <option value="6">06-00</option>
+                <option value="7">07-00</option>
+                <option value="8">08-00</option>
+                <option value="9">09-00</option>
+                <option value="10">10-00</option>
+                <option value="11">11-00</option>
+                <option value="12">12-00</option>
+                <option value="13">13-00</option>
+                <option value="14">14-00</option>
+                <option value="15">15-00</option>
+                <option value="16">16-00</option>
+                <option value="17">17-00</option>
+                <option value="18">18-00</option>
+                <option value="19">19-00</option>
+                <option value="20">20-00</option>
+                <option value="21">21-00</option>
+                <option value="22">22-00</option>
+                <option value="23">23-00</option>
             </select>
             <label for="friday-close">Закрытие : </label>
             <select name="friday-close" id="friday-close">
-                <option>-</option>
-                <option>00-00</option>
-                <option>01-00</option>
-                <option>02-00</option>
-                <option>03-00</option>
-                <option>04-00</option>
-                <option>05-00</option>
-                <option>06-00</option>
-                <option>07-00</option>
-                <option>08-00</option>
-                <option>09-00</option>
-                <option>10-00</option>
-                <option>11-00</option>
-                <option>12-00</option>
-                <option>13-00</option>
-                <option>14-00</option>
-                <option>15-00</option>
-                <option>16-00</option>
-                <option>17-00</option>
-                <option>18-00</option>
-                <option>19-00</option>
-                <option>20-00</option>
-                <option>21-00</option>
-                <option>22-00</option>
-                <option>23-00</option>
-                <option>24-00</option>
+                <option value="n">dayoff</option>
+                <option value="1">01-00</option>
+                <option value="2">02-00</option>
+                <option value="3">03-00</option>
+                <option value="4">04-00</option>
+                <option value="5">05-00</option>
+                <option value="6">06-00</option>
+                <option value="7">07-00</option>
+                <option value="8">08-00</option>
+                <option value="9">09-00</option>
+                <option value="10">10-00</option>
+                <option value="11">11-00</option>
+                <option value="12">12-00</option>
+                <option value="13">13-00</option>
+                <option value="14">14-00</option>
+                <option value="15">15-00</option>
+                <option value="16">16-00</option>
+                <option value="17">17-00</option>
+                <option value="18">18-00</option>
+                <option value="19">19-00</option>
+                <option value="20">20-00</option>
+                <option value="21">21-00</option>
+                <option value="22">22-00</option>
+                <option value="23">23-00</option>
+                <option value="24">24-00</option>
             </select>
         </div>
         <div> СБ
             <label for="saturday-open">Открытие : </label>
             <select name="saturday-open" id="saturday-open">
-                <option>-</option>
-                <option>00-00</option>
-                <option>01-00</option>
-                <option>02-00</option>
-                <option>03-00</option>
-                <option>04-00</option>
-                <option>05-00</option>
-                <option>06-00</option>
-                <option>07-00</option>
-                <option>08-00</option>
-                <option>09-00</option>
-                <option>10-00</option>
-                <option>11-00</option>
-                <option>12-00</option>
-                <option>13-00</option>
-                <option>14-00</option>
-                <option>15-00</option>
-                <option>16-00</option>
-                <option>17-00</option>
-                <option>18-00</option>
-                <option>19-00</option>
-                <option>20-00</option>
-                <option>21-00</option>
-                <option>22-00</option>
-                <option>23-00</option>
-                <option>24-00</option>
+                <option value="n">dayoff</option>
+                <option value="0">00-00</option>
+                <option value="1">01-00</option>
+                <option value="2">02-00</option>
+                <option value="3">03-00</option>
+                <option value="4">04-00</option>
+                <option value="5">05-00</option>
+                <option value="6">06-00</option>
+                <option value="7">07-00</option>
+                <option value="8">08-00</option>
+                <option value="9">09-00</option>
+                <option value="10">10-00</option>
+                <option value="11">11-00</option>
+                <option value="12">12-00</option>
+                <option value="13">13-00</option>
+                <option value="14">14-00</option>
+                <option value="15">15-00</option>
+                <option value="16">16-00</option>
+                <option value="17">17-00</option>
+                <option value="18">18-00</option>
+                <option value="19">19-00</option>
+                <option value="20">20-00</option>
+                <option value="21">21-00</option>
+                <option value="22">22-00</option>
+                <option value="23">23-00</option>
             </select>
             <label for="saturday-close">Закрытие : </label>
             <select name="saturday-close" id="saturday-close">
-                <option>-</option>
-                <option>00-00</option>
-                <option>01-00</option>
-                <option>02-00</option>
-                <option>03-00</option>
-                <option>04-00</option>
-                <option>05-00</option>
-                <option>06-00</option>
-                <option>07-00</option>
-                <option>08-00</option>
-                <option>09-00</option>
-                <option>10-00</option>
-                <option>11-00</option>
-                <option>12-00</option>
-                <option>13-00</option>
-                <option>14-00</option>
-                <option>15-00</option>
-                <option>16-00</option>
-                <option>17-00</option>
-                <option>18-00</option>
-                <option>19-00</option>
-                <option>20-00</option>
-                <option>21-00</option>
-                <option>22-00</option>
-                <option>23-00</option>
-                <option>24-00</option>
+                <option value="n">dayoff</option>
+                <option value="1">01-00</option>
+                <option value="2">02-00</option>
+                <option value="3">03-00</option>
+                <option value="4">04-00</option>
+                <option value="5">05-00</option>
+                <option value="6">06-00</option>
+                <option value="7">07-00</option>
+                <option value="8">08-00</option>
+                <option value="9">09-00</option>
+                <option value="10">10-00</option>
+                <option value="11">11-00</option>
+                <option value="12">12-00</option>
+                <option value="13">13-00</option>
+                <option value="14">14-00</option>
+                <option value="15">15-00</option>
+                <option value="16">16-00</option>
+                <option value="17">17-00</option>
+                <option value="18">18-00</option>
+                <option value="19">19-00</option>
+                <option value="20">20-00</option>
+                <option value="21">21-00</option>
+                <option value="22">22-00</option>
+                <option value="23">23-00</option>
+                <option value="24">24-00</option>
             </select>
         </div>
         <div> ВС
             <label for="sunday-open">Открытие : </label>
             <select name="sunday-open" id="sunday-open">
-                <option>-</option>
-                <option>00-00</option>
-                <option>01-00</option>
-                <option>02-00</option>
-                <option>03-00</option>
-                <option>04-00</option>
-                <option>05-00</option>
-                <option>06-00</option>
-                <option>07-00</option>
-                <option>08-00</option>
-                <option>09-00</option>
-                <option>10-00</option>
-                <option>11-00</option>
-                <option>12-00</option>
-                <option>13-00</option>
-                <option>14-00</option>
-                <option>15-00</option>
-                <option>16-00</option>
-                <option>17-00</option>
-                <option>18-00</option>
-                <option>19-00</option>
-                <option>20-00</option>
-                <option>21-00</option>
-                <option>22-00</option>
-                <option>23-00</option>
-                <option>24-00</option>
+                <option value="n">dayoff</option>
+                <option value="0">00-00</option>
+                <option value="1">01-00</option>
+                <option value="2">02-00</option>
+                <option value="3">03-00</option>
+                <option value="4">04-00</option>
+                <option value="5">05-00</option>
+                <option value="6">06-00</option>
+                <option value="7">07-00</option>
+                <option value="8">08-00</option>
+                <option value="9">09-00</option>
+                <option value="10">10-00</option>
+                <option value="11">11-00</option>
+                <option value="12">12-00</option>
+                <option value="13">13-00</option>
+                <option value="14">14-00</option>
+                <option value="15">15-00</option>
+                <option value="16">16-00</option>
+                <option value="17">17-00</option>
+                <option value="18">18-00</option>
+                <option value="19">19-00</option>
+                <option value="20">20-00</option>
+                <option value="21">21-00</option>
+                <option value="22">22-00</option>
+                <option value="23">23-00</option>
             </select>
             <label for="sunday-close">Закрытие : </label>
             <select name="sunday-close" id="sunday-close">
-                <option>-</option>
-                <option>00-00</option>
-                <option>01-00</option>
-                <option>02-00</option>
-                <option>03-00</option>
-                <option>04-00</option>
-                <option>05-00</option>
-                <option>06-00</option>
-                <option>07-00</option>
-                <option>08-00</option>
-                <option>09-00</option>
-                <option>10-00</option>
-                <option>11-00</option>
-                <option>12-00</option>
-                <option>13-00</option>
-                <option>14-00</option>
-                <option>15-00</option>
-                <option>16-00</option>
-                <option>17-00</option>
-                <option>18-00</option>
-                <option>19-00</option>
-                <option>20-00</option>
-                <option>21-00</option>
-                <option>22-00</option>
-                <option>23-00</option>
-                <option>24-00</option>
+                <option value="n">dayoff</option>
+                <option value="1">01-00</option>
+                <option value="2">02-00</option>
+                <option value="3">03-00</option>
+                <option value="4">04-00</option>
+                <option value="5">05-00</option>
+                <option value="6">06-00</option>
+                <option value="7">07-00</option>
+                <option value="8">08-00</option>
+                <option value="9">09-00</option>
+                <option value="10">10-00</option>
+                <option value="11">11-00</option>
+                <option value="12">12-00</option>
+                <option value="13">13-00</option>
+                <option value="14">14-00</option>
+                <option value="15">15-00</option>
+                <option value="16">16-00</option>
+                <option value="17">17-00</option>
+                <option value="18">18-00</option>
+                <option value="19">19-00</option>
+                <option value="20">20-00</option>
+                <option value="21">21-00</option>
+                <option value="22">22-00</option>
+                <option value="23">23-00</option>
+                <option value="24">24-00</option>
             </select>
         </div>
         <button type="submit" name="submit">Добавить</button>
